@@ -106,7 +106,7 @@ public static partial class CompiledReflection
 
         private static void CreateGetPropertyInfo(StringBuilder sb, HashSet<ITypeSymbol> getPropertyInfoCalls)
         {
-            sb.Append(@"
+            sb.AppendLine(@"
     public static partial IEnumerable<CompiledPropertyInfo> GetPropertyInfo<T>()
     {
         var wrapper = new TypeWrapper<T>();
@@ -118,14 +118,13 @@ public static partial class CompiledReflection
             foreach (var type in getPropertyInfoCalls)
             {
                 var typeName = type.ToDisplayString(Constants.SymbolDisplayFormat);
-                sb.AppendLine($"\t\t\tTypeWrapper<{typeName}> w => GetPropertyInfo(w),");
+                sb.AppendLine($"            TypeWrapper<{typeName}> w => GetPropertyInfo(w),");
             }
 
-            sb.Append(@"
-            _ => throw new System.NotImplementedException()
-            };
-        }"
-            );
+            sb.AppendLine(@"            _ => throw new System.NotImplementedException()");
+
+            sb.AppendLine("         };");
+            sb.AppendLine("     }");
 
             foreach (var type in getPropertyInfoCalls)
             {
@@ -143,10 +142,11 @@ public static partial class CompiledReflection
 
                 foreach (var property in properties)
                 {
-                    sb.AppendLine($"\t\t\tnew CompiledPropertyInfo(\"{property.Name}\", \"{property.Type.ToDisplayString(Constants.SymbolDisplayFormat)}\"),");
+                    sb.AppendLine($"            new CompiledPropertyInfo(\"{property.Name}\", \"{property.Type.ToDisplayString(Constants.SymbolDisplayFormat)}\"),");
                 }
 
-                sb.AppendLine("\t\t};}");
+                sb.AppendLine("         };");
+                sb.AppendLine("     }");
             }
         }
 
@@ -161,17 +161,18 @@ public static partial class CompiledReflection
         {"
             );
 
+            sb.AppendLine();
+
             foreach (var type in typesWhereGetPropertyNamesWasCalled)
             {
                 var typeName = type.ToDisplayString(Constants.SymbolDisplayFormat);
-                sb.AppendLine($"\t\t\tTypeWrapper<{typeName}> w => GetPropertyNames(w),");
+                sb.AppendLine($"            TypeWrapper<{typeName}> w => GetPropertyNames(w),");
             }
 
-            sb.Append(@"
-            _ => throw new System.NotImplementedException()
-            };
-        }"
-            );
+            sb.AppendLine(@"            _ => throw new System.NotImplementedException()");
+
+            sb.AppendLine("         };");
+            sb.AppendLine("     }");
 
             foreach (var type in typesWhereGetPropertyNamesWasCalled)
             {
@@ -188,10 +189,11 @@ public static partial class CompiledReflection
 
                 foreach (string propertyName in propertyNames)
                 {
-                    sb.AppendLine("\t\t\t\"" + propertyName + "\",");
+                    sb.AppendLine("         \"" + propertyName + "\",");
                 }
 
-                sb.AppendLine("\t\t};}");
+                sb.AppendLine("         };");
+                sb.AppendLine("     }");
             }
         }
     }

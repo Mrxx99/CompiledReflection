@@ -95,23 +95,23 @@ public partial class CompiledPropertyInfo
         private void CreateTrySetValueMethods(StringBuilder sb, HashSet<ITypeSymbol> getPropertyInfoCalls)
         {
             sb.Append(@"
-        public partial bool TrySetValue(object instance, object value)
-        {
-            return instance switch
-            {"
+    public partial bool TrySetValue(object instance, object value)
+    {
+        return instance switch
+        {"
             );
+
+            sb.AppendLine();
 
             foreach (var type in getPropertyInfoCalls)
             {
                 var typeName = type.ToDisplayString(Constants.SymbolDisplayFormat);
-                sb.AppendLine($"\t\t\t{typeName} i => TrySetValueInternal(i, value),");
+                sb.AppendLine(@$"           {typeName} i => TrySetValueInternal(i, value),");
             }
 
-            sb.Append(@"
-            _ => false
-            };
-        }"
-            );
+            sb.AppendLine(@"            _ => false");
+            sb.AppendLine("         };");
+            sb.AppendLine("     }");
 
             foreach (var type in getPropertyInfoCalls)
             {
@@ -126,17 +126,19 @@ public partial class CompiledPropertyInfo
         {{"
                 );
 
+                sb.AppendLine();
+
                 foreach (var property in properties)
                 {
                     string propertyType = property.Type.ToDisplayString(Constants.SymbolDisplayFormat);
-                    sb.AppendLine($"\t\t\tcase (\"{property.Name}\", {propertyType} v): instance.{property.Name} = v; break;");
+                    sb.AppendLine($"            case (\"{property.Name}\", {propertyType} v): instance.{property.Name} = v; break;");
                 }
 
-                sb.AppendLine("\t\t\tdefault: success = false; break;");
+                sb.AppendLine("             default: success = false; break;");
 
-                sb.AppendLine("\t\t}");
-                sb.AppendLine("\t\treturn success;");
-                sb.AppendLine("\t}");
+                sb.AppendLine("         }");
+                sb.AppendLine("         return success;");
+                sb.AppendLine("     }");
 
             }
         }
@@ -162,16 +164,17 @@ public partial class CompiledPropertyInfo
         {"
             );
 
+            sb.AppendLine();
+
             foreach (var type in getPropertyInfoCalls)
             {
                 var typeName = type.ToDisplayString(Constants.SymbolDisplayFormat);
-                sb.AppendLine($"\t\t\t{typeName} i => GetValue(i),");
+                sb.AppendLine(@$"           {typeName} i => GetValue(i),");
             }
 
-            sb.Append(@"
-            _ => throw new System.NotImplementedException()
-            };
-        }"
+            sb.AppendLine(@"            _ => throw new System.NotImplementedException()
+        };
+    }"
             );
 
             foreach (var type in getPropertyInfoCalls)
@@ -188,11 +191,11 @@ public partial class CompiledPropertyInfo
 
                 foreach (string propertyName in propertyNames)
                 {
-                    sb.AppendLine($"\t\t\t\"{propertyName}\" => instance.{propertyName},");
+                    sb.AppendLine($"            \"{propertyName}\" => instance.{propertyName},");
                 }
 
-                sb.AppendLine("\t\t};");
-                sb.AppendLine("\t}");
+                sb.AppendLine("         };");
+                sb.AppendLine("     }");
             }
         }
     }

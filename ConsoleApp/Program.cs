@@ -30,9 +30,17 @@ namespace ConsoleApp
                 Console.WriteLine(p);
             }
 
-            var pis = CompiledReflection.GetPropertyInfo<TestClass>();
+            var pis = CompiledReflection.GetPropertyInfo<TestClass>().ToList();
 
             var tc = new TestClass { MyProperty = 42, MyProperty2 = "23" };
+
+            foreach (var pi in pis)
+            {
+                Console.WriteLine($"{pi.TypeName} {pi.Name} {pi.GetValue(tc)}");
+            }
+            
+            Console.WriteLine(pis[0].TrySetValue(tc, 142));
+            Console.WriteLine(pis[1].TrySetValue(tc, "123"));
 
             foreach (var pi in pis)
             {

@@ -44,7 +44,7 @@ namespace ConsoleApp
             Console.WriteLine(pis[2].TrySetValue(tc, "148"));
             Console.WriteLine(pis[3].TrySetValue(tc, new TestClass()));
 
-            foreach (var pi in pis)
+            foreach (var pi in pis.Where(i => i.SetAccessibility != Accessibility.Private))
             {
                 Console.WriteLine($"{pi.TypeName} {pi.Name} {pi.GetValue(tc)}");
             }

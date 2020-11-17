@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SourceGenerator
+namespace SourceGenerator.Test
 {
     public class A
     {
@@ -16,16 +16,30 @@ namespace SourceGenerator
     }
 
 
+    public enum Accessibility
+    {
+        Private,
+        Protected,
+        Internal,
+        Public
+    }
+
     public partial class CompiledPropertyInfo
     {
-        public CompiledPropertyInfo(string name, string typeName)
+        public CompiledPropertyInfo(string name, string typeName, Accessibility getAccessibility, Accessibility setAccessibility, bool isInitOnly)
         {
             Name = name;
             TypeName = typeName;
+            GetAccessibility = getAccessibility;
+            SetAccessibility = setAccessibility;
+            IsInitOnly = isInitOnly;
         }
 
-        public string Name { get; set; }
-        public string TypeName { get; set; }
+        public string Name { get; }
+        public string TypeName { get; }
+        public Accessibility GetAccessibility { get; }
+        public Accessibility SetAccessibility { get; }
+        public bool IsInitOnly { get; }
 
         public partial object GetValue(object instance);
 
@@ -141,8 +155,8 @@ namespace SourceGenerator
         {
             return new List<CompiledPropertyInfo>
             {
-                new CompiledPropertyInfo("Ab", typeof(string).FullName),
-                new CompiledPropertyInfo("B", typeof(int).FullName),
+                new CompiledPropertyInfo("Ab", typeof(string).FullName, Accessibility.Public, Accessibility.Public, false),
+                new CompiledPropertyInfo("B", typeof(int).FullName, Accessibility.Public, Accessibility.Public, false),
             };
         }
 

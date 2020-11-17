@@ -27,11 +27,17 @@ public partial class CompiledPropertyInfo
 {
     public string Name { get; }
     public string TypeName { get; }
+    public Accessibility GetAccessibility { get; }
+    public Accessibility SetAccessibility { get; }
+    public bool IsInitOnly { get; }
 
-    public CompiledPropertyInfo(string name, string typeName)
+    public CompiledPropertyInfo(string name, string typeName, Accessibility getAccessibility, Accessibility setAccessibility, bool isInitOnly)
     {
         Name = name;
         TypeName = typeName;
+        GetAccessibility = getAccessibility;
+        SetAccessibility = setAccessibility;
+        IsInitOnly = isInitOnly;
     }
 
     public partial object GetValue(object instance);

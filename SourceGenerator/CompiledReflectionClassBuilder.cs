@@ -142,7 +142,12 @@ public static partial class CompiledReflection
 
                 foreach (var property in properties)
                 {
-                    sb.AppendLine($"            new CompiledPropertyInfo(\"{property.Name}\", \"{property.Type.ToDisplayString(Constants.SymbolDisplayFormat)}\"),");
+                    string propertyType = property.Type.ToDisplayString(Constants.SymbolDisplayFormat);
+                    string getAccessibility = property.GetMethod?.DeclaredAccessibility.GetAccessibiltyString() ?? AccessibilityStrings.Private;
+                    string setAccessibility = property.SetMethod?.DeclaredAccessibility.GetAccessibiltyString() ?? AccessibilityStrings.Private;
+                    string isInitOnly = property.SetMethod?.IsInitOnly.ToString().ToLowerInvariant() ?? "false";
+                    sb.AppendLine($"            new CompiledPropertyInfo(\"{property.Name}\", \"{propertyType}\", " +
+                        $"{AccessibilityStrings.Accessibility}.{getAccessibility}, {AccessibilityStrings.Accessibility}.{setAccessibility}, {isInitOnly}),");
                 }
 
                 sb.AppendLine("         };");

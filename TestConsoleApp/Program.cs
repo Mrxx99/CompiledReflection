@@ -18,8 +18,13 @@ namespace Foo
 {
     class C
     {
+        public int PropertyA { get; set; }
+        public string PropertyB { get; set; }
+
         void M()
         {
+            CompiledReflection.GetPropertyNames<C>();
+            CompiledReflection.GetPropertyInfo<C>();
         }
     }
 }";
@@ -70,7 +75,7 @@ namespace Foo
             var driver = CSharpGeneratorDriver.Create(generator);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var generateDiagnostics);
 
-            return (generateDiagnostics, outputCompilation.SyntaxTrees.Last().ToString());
+            return (generateDiagnostics, string.Join(Environment.NewLine, outputCompilation.SyntaxTrees));
         }
     }
 }

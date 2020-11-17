@@ -32,7 +32,7 @@ namespace ConsoleApp
 
             var pis = CompiledReflection.GetPropertyInfo<TestClass>().ToList();
 
-            var tc = new TestClass { MyProperty = 42, MyProperty2 = "23" };
+            var tc = new TestClass { MyProperty = 42, MyProperty2 = "23", MyProperty2b = "48" };
 
             foreach (var pi in pis)
             {
@@ -41,6 +41,8 @@ namespace ConsoleApp
             
             Console.WriteLine(pis[0].TrySetValue(tc, 142));
             Console.WriteLine(pis[1].TrySetValue(tc, "123"));
+            Console.WriteLine(pis[2].TrySetValue(tc, "148"));
+            Console.WriteLine(pis[3].TrySetValue(tc, new TestClass()));
 
             foreach (var pi in pis)
             {
@@ -51,7 +53,11 @@ namespace ConsoleApp
 
     public class TestClass
     {
-        public int MyProperty { get; set; }
+        public int MyProperty { get; init; }
         public string MyProperty2 { get; set; }
+        internal string MyProperty2b { get; set; }
+        public TestClass MyProperty3 { get; }
+        public TestClass MyProperty4 { get; private set; }
+        public double MyProperty5 { private get; set; }
     }
 }

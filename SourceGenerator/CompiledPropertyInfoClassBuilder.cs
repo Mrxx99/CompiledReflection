@@ -83,6 +83,8 @@ public partial class CompiledPropertyInfo
 
             StartClass(sb);
 
+            //System.Diagnostics.Debugger.Launch();
+
             CreateGetValueMethods(sb, _getPropertyInfoCalls);
             CreateTrySetValueMethods(sb, _getPropertyInfoCalls);
 
@@ -121,7 +123,7 @@ public partial class CompiledPropertyInfo
                 sb.AppendLine(@$"
     private bool TrySetValueInternal({typeName} instance, object value)
     {{
-        bool success = false;
+        bool success = true;
         switch ((Name, value))
         {{"
                 );
@@ -130,11 +132,18 @@ public partial class CompiledPropertyInfo
 
                 foreach (var property in properties)
                 {
+                    var setMethod = property.SetMethod;
+
+                    if (setMethod is null || setMethod.DeclaredAccessibility is Accessibility.Private or Accessibility.Protected || setMethod.IsInitOnly)
+                    {
+                        continue;
+                    }
+
                     string propertyType = property.Type.ToDisplayString(Constants.SymbolDisplayFormat);
                     sb.AppendLine($"            case (\"{property.Name}\", {propertyType} v): instance.{property.Name} = v; break;");
                 }
 
-                sb.AppendLine("             default: success = false; break;");
+                sb.AppendLine("         default: success = false; break;");
 
                 sb.AppendLine("         }");
                 sb.AppendLine("         return success;");
@@ -180,7 +189,7 @@ public partial class CompiledPropertyInfo
             foreach (var type in getPropertyInfoCalls)
             {
                 var typeName = type.ToDisplayString(Constants.SymbolDisplayFormat);
-                var propertyNames = type.GetMembers().Where(s => s.Kind == SymbolKind.Property && !s.IsStatic).Select(s => s.Name).ToArray();
+                var properties = type.GetMembers().Where(s => s.Kind == SymbolKind.Property && !s.IsStatic).OfType<IPropertySymbol>().ToArray();
 
                 sb.AppendLine(@$"
     private object GetValue({typeName} instance)
@@ -189,10 +198,19 @@ public partial class CompiledPropertyInfo
         {{"
                 );
 
-                foreach (string propertyName in propertyNames)
+                foreach (var property in properties)
                 {
-                    sb.AppendLine($"            \"{propertyName}\" => instance.{propertyName},");
+                    var getMethod = property.GetMethod;
+
+                    if (getMethod is null || getMethod.DeclaredAccessibility is Accessibility.Private or Accessibility.Protected)
+                    {
+                        continue;
+                    }
+
+                    sb.AppendLine($"            \"{property.Name}\" => instance.{property.Name},");
                 }
+
+                sb.AppendLine($"            _ => null");
 
                 sb.AppendLine("         };");
                 sb.AppendLine("     }");
